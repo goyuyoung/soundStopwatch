@@ -10,40 +10,52 @@
 <body>
 
     <div class="fullArea" id="fullArea">
-        <div class="container" id="stopwatch">
-            
-            <p class="title" id="title">ㅤ</p>
-            
-            <p class="time" id="time">
-                <span id="minutes">00</span>:<span id="seconds">00</span>:<span id="tens">00</span>
-            </p>
-            <button id="start" class="start"><i class="fa-solid fa-play"></i></button>
-            <button id="stop" class="stop"><i class="fa-solid fa-pause"></i></button>
-            <button id="reset" class="reset"><i class="fa-solid fa-rotate-right"></i></button>
-        </div>
+        <div class="container" id="container">
 
-        <!-- 전체화면일때 display none처리 -->
-        <div class="addCheck" id="addCheck">
-            <a href="#" id="fullSizeBtn" class="fullSizeBtn">전체화면</a>
-            <div class="add" id="add">
-                <span>배경화면 이미지 : </span>ㅤ
-                <input type="radio" name="bg_check" value="black" checked> 검정색ㅤ
-                <input type="radio" name="bg_check" value="white"> 흰색ㅤ
-                <input type="radio" name="bg_check" value="ocean"> 바다ㅤ
-                <input type="radio" name="bg_check" value="fire"> 모닥불ㅤ
-                <input type="radio" name="bg_check" value="rain"> 소나기
-
+            <div class="top" id="top">
+        
+                <p class="time" id="time">
+                    <span id="minutes">00</span>:<span id="seconds">00</span>:<span id="tens">00</span>
+                </p>
+                <div class="time-button">
+                    <button id="start" class="start"><i class="fa-solid fa-play"></i></button>
+                    <button id="stop" class="stop"><i class="fa-solid fa-pause"></i></button>
+                    <button id="reset" class="reset"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+                
             </div>
-            <div class="info" id="info">
-                <p class="line"></p>
-                <p><i class="fa-solid fa-circle-info"> 사용방법</i></p>
-                <p><i class="fa-solid fa-check"></i> 기본 배경화면은 검정색 화면입니다.</p>
-                <p><i class="fa-solid fa-check"></i> 전체화면 적용시에만 배경화면 변경이 가능합니다.</p>
-                <p><i class="fa-solid fa-check"></i> 배경화면 선택에 따라 <strong>배경음악</strong>이 자동으로 선택됩니다.</p>
-                <p><i class="fa-solid fa-check"></i> <strong>[전체화면] 버튼</strong>을 누르면 전체 화면으로 전환됩니다.</p>
-                <p><i class="fa-solid fa-check"></i> 전체화면은 <strong>esc버튼 클릭</strong>시 해제됩니다.</p>        
+    
+            <div class="addCheck" id="addCheck">
+                <a href="#" id="fullSizeBtn" class="fullSizeBtn">전체화면</a>
+                <div class="add" id="add">
+                    <p class="add_title"><i class="fa-solid fa-quote-left"></i>ㅤ배경화면 이미지를 선택해주세요.ㅤ<i class="fa-solid fa-quote-right"></i></p>
+                    <div class="add_list">
+                        <ul class="menu-wrap">
+                            <li value="0" class="selected">검정색</li>
+                            <li value="1">흰색</li>
+                            <li value="2">바다</li>
+                            <li value="3">모닥불</li>
+                            <li value="4">소나기</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="info" id="info">
+                    <p class="line"></p>
+                    <p class="info_title"><i class="fa-solid fa-circle-info"> 사용방법</i></p>
+                    
+                    
+                    <div class="info_text" id="info_text">
+                        <p><i class="fa-solid fa-check"></i> 기본 배경화면은 검정색 화면입니다.</p>
+                        <p><i class="fa-solid fa-check"></i> 전체화면 적용시에만 배경화면 변경이 가능합니다.</p>
+                        <p><i class="fa-solid fa-check"></i> 배경화면 선택에 따라 <strong>배경음악</strong>이 자동으로 선택됩니다.</p>
+                        <p><i class="fa-solid fa-check"></i> <strong>[전체화면] 버튼</strong>을 누르면 전체 화면으로 전환됩니다.</p>
+                        <p><i class="fa-solid fa-check"></i> 전체화면은 <strong>Esc버튼 클릭</strong>시 해제됩니다.</p>        
+                    </div>
+                    
+                </div>
             </div>
         </div>
+        
     </div>
     <div class="footer" id="footer">
         © yooou 2023. All Rights Reserved
@@ -64,6 +76,9 @@
         let Interval;
         let fullSizeBtn = document.querySelector('#fullSizeBtn');
         let fullCheck = true;
+        let menuWrap = document.querySelector('.menu-wrap');
+        let addList = ["black", "white", "ocean", "fire", "rain"];
+        let selectedImage = "black";
 
         const startTimer = () => {
             tens++;
@@ -127,7 +142,7 @@
                 fullArea.msRequestFullscreen();
             }
             //backgroud setting
-            let bg_check = document.querySelector('input[name="bg_check"]:checked').value;
+            let bg_check = addList[document.querySelector('li.selected').value];
             if (bg_check == 'black') {
                 fullArea.style.backgroundColor = "#000000";
             } else if (bg_check == 'white') {
@@ -136,10 +151,6 @@
             } else {
                 fullArea.style.backgroundImage = "url(img/" + bg_check + ".jpg)";
             }
-            
-            
-            // fullSizeBtn.innerHTML = 'original size';
-            // document.querySelector('#icon').src = "original-icon.png"
         }
 
         function setOriginalScreen() {
@@ -152,9 +163,15 @@
             }else if (document.msExitFullscreen) {
                 document.msExitFullscreen();
             }
+        }
 
-            // fullSizeBtn.innerHTML = 'full size';
-            // document.querySelector('#icon').src = "full-icon.png"
+        function setOriginalCSS() {
+            document.querySelector("#addCheck").style.display = 'block';
+            document.querySelector('#fullArea').style.backgroundImage = ""
+            document.querySelector('#fullArea').style.backgroundColor = "#000000";
+            document.querySelector('#time').style.color = "#f8f8f8";
+            document.querySelector('#time').style.fontSize = '150px';
+            document.querySelector('#time').style.marginTop = '100px';
         }
 
         document.addEventListener("fullscreenchange", (e) => {
@@ -163,10 +180,7 @@
             }
             else { //original
                 fullCheck = true;
-                document.querySelector("#addCheck").style.display = 'block';
-                document.querySelector('#fullArea').style.backgroundImage = ""
-                document.querySelector('#fullArea').style.backgroundColor = "#000000";
-                document.querySelector('#time').style.color = "#f8f8f8";
+                setOriginalCSS();
             }
         });
         
@@ -174,19 +188,32 @@
             if(fullCheck) { //full
                 fullCheck = false;
                 document.querySelector("#addCheck").style.display = 'none';
+                document.querySelector('#time').style.fontSize = '175px';
+                document.querySelector('#time').style.marginTop = '0'
                 setFullScreen();
                 
             }else { //original
                 fullCheck = true;
-                document.querySelector("#addCheck").style.display = 'block';
-                document.querySelector('#fullArea').style.backgroundImage = ""
-                document.querySelector('#fullArea').style.backgroundColor = "#000000";
-                document.querySelector('#time').style.color = "#f8f8f8";
+                setOriginalCSS();
                 setOriginalScreen();
 
             }
             
         };
+ 
+        function imageSelect(ulEl, liEl){
+            Array.from(ulEl.children).forEach(
+                v => v.classList.remove('selected')
+            )
+            if(liEl) liEl.classList.add('selected');
+        }
+ 
+        menuWrap.addEventListener('click', e => {
+            let selected = e.target;
+            if (selected.tagName == "UL") return;
+            imageSelect(menuWrap, selected);
+            selectedImage = addList[selected.value];
+        })
        
 
     }
@@ -197,7 +224,6 @@
 </html>
 
 
-<!-- https://ontimetimer.com/ko -->
 <!-- howler.js -->
-<!-- 반응형 수정 필요 -->
 <!-- 음악 편집해서 라이브러리 연동 -->
+<!-- soundstopwatch.co.kr -->
