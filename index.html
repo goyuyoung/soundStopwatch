@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="fullArea" id="fullArea">
+        <div class="container" id="stopwatch">
+            
+            <p class="title" id="title">ㅤ</p>
+            
+            <p class="time" id="time">
+                <span id="minutes">00</span>:<span id="seconds">00</span>:<span id="tens">00</span>
+            </p>
+            <button id="start" class="start"><i class="fa-solid fa-play"></i></button>
+            <button id="stop" class="stop"><i class="fa-solid fa-pause"></i></button>
+            <button id="reset" class="reset"><i class="fa-solid fa-rotate-right"></i></button>
+        </div>
+
+        <!-- 전체화면일때 display none처리 -->
+        <div class="addCheck" id="addCheck">
+            <a href="#" id="fullSizeBtn" class="fullSizeBtn">전체화면</a>
+            <div class="add" id="add">
+                <span>배경화면 이미지 : </span>ㅤ
+                <input type="radio" name="bg_check" value="black" checked> 검정색ㅤ
+                <input type="radio" name="bg_check" value="white"> 흰색ㅤ
+                <input type="radio" name="bg_check" value="ocean"> 바다ㅤ
+                <input type="radio" name="bg_check" value="fire"> 모닥불ㅤ
+                <input type="radio" name="bg_check" value="rain"> 소나기
+
+            </div>
+            <div class="info" id="info">
+                <p class="line"></p>
+                <p><i class="fa-solid fa-circle-info"> 사용방법</i></p>
+                <p><i class="fa-solid fa-check"></i> 기본 배경화면은 검정색 화면입니다.</p>
+                <p><i class="fa-solid fa-check"></i> 전체화면 적용시에만 배경화면 변경이 가능합니다.</p>
+                <p><i class="fa-solid fa-check"></i> 배경화면 선택에 따라 <strong>배경음악</strong>이 자동으로 선택됩니다.</p>
+                <p><i class="fa-solid fa-check"></i> <strong>[전체화면] 버튼</strong>을 누르면 전체 화면으로 전환됩니다.</p>
+                <p><i class="fa-solid fa-check"></i> 전체화면은 <strong>esc버튼 클릭</strong>시 해제됩니다.</p>        
+            </div>
+        </div>
+    </div>
+    <div class="footer" id="footer">
+        © yooou 2023. All Rights Reserved
+    </div>
+</body>
+
+<script>
+    window.onload = function () {
+        let minutes = 0;
+        let seconds = 0;
+        let tens = 0;
+        let appendMinutes = document.querySelector('#minutes');
+        let appendSecond = document.querySelector('#seconds');
+        let appendTens = document.querySelector('#tens');
+        let startBtn = document.querySelector('#start');
+        let stopBtn = document.querySelector('#stop');
+        let resetBtn = document.querySelector('#reset');
+        let Interval;
+        let fullSizeBtn = document.querySelector('#fullSizeBtn');
+        let fullCheck = true;
+
+        const startTimer = () => {
+            tens++;
+            if (tens <= 9) {
+                appendTens.innerHTML = '0' + tens;
+            }
+            if (tens > 9) {
+                appendTens.innerHTML = tens;
+            }
+
+            if (tens > 99) {
+                seconds ++;
+
+                if (seconds > 9) {
+                    appendSecond.innerHTML = seconds;    
+                } else {
+                    appendSecond.innerHTML = '0' + seconds;
+                }
+
+                tens = 0;
+                appendTens.innerHTML = '0' + 0;
+            }
+
+            if (seconds > 59) {
+                minutes++;
+                appendMinutes.innerHTML = minutes;
+                seconds = 0;
+                appendSecond.innerHTML = '0' + 0;
+            }
+
+        };
+
+        startBtn.onclick = () => {
+            clearInterval(Interval);
+            Interval = setInterval(startTimer, 10);
+        };
+
+        stopBtn.onclick = () => {
+            clearInterval(Interval);
+        };
+
+        resetBtn.onclick = () => {
+            clearInterval(Interval);
+            tens = '00';
+            seconds = '00';
+            minutes = '00';
+            appendTens.innerHTML = tens;
+            appendSecond.innerHTML = seconds;
+            appendMinutes.innerHTML = tens;
+        };
+
+        function setFullScreen() {
+            let fullArea = document.querySelector('#fullArea');
+            if (fullArea.requestFullscreen) {
+                fullArea.requestFullscreen();    
+            }else if (fullArea.mozRequestFullScreen) {
+                fullArea.mozRequestFullScreen();
+            }else if (fullArea.webkitRequestFullscreen) {
+                fullArea.webkitRequestFullscreen();
+            }else if (fullArea.msRequestFullscreen) {
+                fullArea.msRequestFullscreen();
+            }
+            //backgroud setting
+            let bg_check = document.querySelector('input[name="bg_check"]:checked').value;
+            if (bg_check == 'black') {
+                fullArea.style.backgroundColor = "#000000";
+            } else if (bg_check == 'white') {
+                fullArea.style.backgroundColor = "#ffffff";
+                document.querySelector('#time').style.color = "#000000";
+            } else {
+                fullArea.style.backgroundImage = "url(img/" + bg_check + ".jpg)";
+            }
+            
+            
+            // fullSizeBtn.innerHTML = 'original size';
+            // document.querySelector('#icon').src = "original-icon.png"
+        }
+
+        function setOriginalScreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();    
+            }else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            }else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+
+            // fullSizeBtn.innerHTML = 'full size';
+            // document.querySelector('#icon').src = "full-icon.png"
+        }
+
+        document.addEventListener("fullscreenchange", (e) => {
+            if (document.fullscreenElement) { //full
+                fullCheck = false;
+            }
+            else { //original
+                fullCheck = true;
+                document.querySelector("#addCheck").style.display = 'block';
+                document.querySelector('#fullArea').style.backgroundImage = ""
+                document.querySelector('#fullArea').style.backgroundColor = "#000000";
+                document.querySelector('#time').style.color = "#f8f8f8";
+            }
+        });
+        
+        fullSizeBtn.onclick = () => {
+            if(fullCheck) { //full
+                fullCheck = false;
+                document.querySelector("#addCheck").style.display = 'none';
+                setFullScreen();
+                
+            }else { //original
+                fullCheck = true;
+                document.querySelector("#addCheck").style.display = 'block';
+                document.querySelector('#fullArea').style.backgroundImage = ""
+                document.querySelector('#fullArea').style.backgroundColor = "#000000";
+                document.querySelector('#time').style.color = "#f8f8f8";
+                setOriginalScreen();
+
+            }
+            
+        };
+       
+
+    }
+        
+</script>
+
+
+</html>
+
+
+<!-- https://ontimetimer.com/ko -->
+<!-- howler.js -->
+<!-- 반응형 수정 필요 -->
+<!-- 음악 편집해서 라이브러리 연동 -->
