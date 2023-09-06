@@ -6,6 +6,8 @@
     <title>Stopwatch</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.js" integrity="sha512-dMiBqqEV5i3KqpAdsgQSSZ72DnNib7otY0X+b/Tnn1EmLym1dxuZ19csdZqBnfDniKd9bmNtzStQzuMrIa5Ngw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
 </head>
 <body>
 
@@ -26,16 +28,27 @@
             </div>
     
             <div class="addCheck" id="addCheck">
+                <a href="#" id="test" class="fullSizeBtn">음악 테스트</a>
                 <a href="#" id="fullSizeBtn" class="fullSizeBtn">전체화면</a>
                 <div class="add" id="add">
                     <p class="add_title"><i class="fa-solid fa-quote-left"></i>ㅤ배경화면 이미지를 선택해주세요.ㅤ<i class="fa-solid fa-quote-right"></i></p>
                     <div class="add_list">
-                        <ul class="menu-wrap">
+                        <ul class="menu-wrap" id="image-menu-wrap">
                             <li value="0" class="selected">검정색</li>
                             <li value="1">흰색</li>
                             <li value="2">바다</li>
                             <li value="3">모닥불</li>
                             <li value="4">소나기</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="add" id="add_sound">
+                    <p class="add_title"><i class="fa-solid fa-quote-left"></i>ㅤ배경음악을 선택해주세요.ㅤ<i class="fa-solid fa-quote-right"></i></p>
+                    <div class="add_list">
+                        <ul class="menu-wrap" id="sound-menu-wrap">
+                            <li value="0" class="selected">파도 ASMR</li>
+                            <li value="1">모닥불 ASMR</li>
+                            <li value="2">빗소리 ASMR</li>
                         </ul>
                     </div>
                 </div>
@@ -48,8 +61,10 @@
                         <p><i class="fa-solid fa-check"></i> 기본 배경화면은 검정색 화면입니다.</p>
                         <p><i class="fa-solid fa-check"></i> 전체화면 적용시에만 배경화면 변경이 가능합니다.</p>
                         <p><i class="fa-solid fa-check"></i> 배경화면 선택에 따라 <strong>배경음악</strong>이 자동으로 선택됩니다.</p>
+                        <p><i class="fa-solid fa-check"></i> 검정색, 흰색(배경화면 이미지) 선택시에는 원하시는 배경음악을 선택하세요.</p>
                         <p><i class="fa-solid fa-check"></i> <strong>[전체화면] 버튼</strong>을 누르면 전체 화면으로 전환됩니다.</p>
                         <p><i class="fa-solid fa-check"></i> 전체화면은 <strong>Esc버튼 클릭</strong>시 해제됩니다.</p>        
+                        <p><i class="fa-solid fa-check"></i> 배경음악은 <strong>전체화면 실행</strong>시 재생됩니다.</p>
                     </div>
                     
                 </div>
@@ -76,9 +91,13 @@
         let Interval;
         let fullSizeBtn = document.querySelector('#fullSizeBtn');
         let fullCheck = true;
-        let menuWrap = document.querySelector('.menu-wrap');
-        let addList = ["black", "white", "ocean", "fire", "rain"];
+        let imageMenuWrap = document.querySelector('#image-menu-wrap');
+        let soundMenuWrap = document.querySelector('#sound-menu-wrap');
+        let imageAddList = ["black", "white", "ocean", "fire", "rain"];
         let selectedImage = "black";
+        let soundAddList = ['ocean', 'fire', 'rain'];
+        let selectedSound = "ocean";
+        let sound_obj;
 
         const startTimer = () => {
             tens++;
@@ -142,7 +161,7 @@
                 fullArea.msRequestFullscreen();
             }
             //backgroud setting
-            let bg_check = addList[document.querySelector('li.selected').value];
+            let bg_check = imageAddList[document.querySelector('li.selected').value];
             if (bg_check == 'black') {
                 fullArea.style.backgroundColor = "#000000";
             } else if (bg_check == 'white') {
@@ -151,6 +170,19 @@
             } else {
                 fullArea.style.backgroundImage = "url(img/" + bg_check + ".jpg)";
             }
+            console.log(selectedSound);
+            var sound = new Howl({
+                src: ['sound/' + selectedSound+ '.mp3'],
+                loop: true,
+                onplay: function(){
+                    console.log("start!");
+                },
+                onend : function() {
+                    console.log("end!");
+                }
+            });
+            sound_obj = sound;
+            sound.play();
         }
 
         function setOriginalScreen() {
@@ -172,6 +204,18 @@
             document.querySelector('#time').style.color = "#f8f8f8";
             document.querySelector('#time').style.fontSize = '150px';
             document.querySelector('#time').style.marginTop = '100px';
+            
+            var sound = new Howl({
+                src: ['sound/' + selectedSound+ '.mp3'],
+                loop: true,
+                onplay: function(){
+                    console.log("start!");
+                },
+                onend : function() {
+                    console.log("end!");
+                }
+            });
+            sound_obj.stop();
         }
 
         document.addEventListener("fullscreenchange", (e) => {
@@ -201,21 +245,33 @@
             
         };
  
-        function imageSelect(ulEl, liEl){
+        function select(ulEl, liEl){
             Array.from(ulEl.children).forEach(
                 v => v.classList.remove('selected')
             )
             if(liEl) liEl.classList.add('selected');
         }
  
-        menuWrap.addEventListener('click', e => {
+        imageMenuWrap.addEventListener('click', e => {
             let selected = e.target;
             if (selected.tagName == "UL") return;
-            imageSelect(menuWrap, selected);
-            selectedImage = addList[selected.value];
+            select(imageMenuWrap, selected);
+            selectedImage = imageAddList[selected.value];
+            
+            if(selected.value > 1) {
+                selectedSound = selectedImage;
+                select(soundMenuWrap, soundMenuWrap.children[e.target.value - 2] );
+            }
+
+        })
+
+        soundMenuWrap.addEventListener('click', e => {
+            let selected = e.target;
+            if (selected.tagName == "UL") return;
+            select(soundMenuWrap, selected);
+            selectedSound = soundAddList[selected.value];
         })
        
-
     }
         
 </script>
@@ -223,7 +279,4 @@
 
 </html>
 
-
-<!-- howler.js -->
-<!-- 음악 편집해서 라이브러리 연동 -->
 <!-- soundstopwatch.co.kr -->
