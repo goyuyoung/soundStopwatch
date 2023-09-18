@@ -38,6 +38,7 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.js" integrity="sha512-dMiBqqEV5i3KqpAdsgQSSZ72DnNib7otY0X+b/Tnn1EmLym1dxuZ19csdZqBnfDniKd9bmNtzStQzuMrIa5Ngw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     
 
@@ -79,7 +80,7 @@
             </div>
     
             <div class="addCheck" id="addCheck">
-                <a href="#" id="fullSizeBtn" class="sizeBtn">전체화면</a>
+                <a href="#" id="fullSizeBtn" class="sizeBtn" onclick="doFullScreen()">전체화면</a>
                 <div class="add" id="add">
                     <p class="add_title"><i class="fa-solid fa-quote-left"></i>ㅤ배경화면 이미지를 선택해주세요.ㅤ<i class="fa-solid fa-quote-right"></i></p>
                     <div class="add_list">
@@ -128,6 +129,116 @@
 </body>
 
 <script>
+    var fullCheck = true;
+    var imageMenuWrap = document.querySelector('#image-menu-wrap');
+    var soundMenuWrap = document.querySelector('#sound-menu-wrap');
+    var imageAddList = ["black", "white", "ocean", "fire", "rain"];
+    var selectedImage = "black";
+    var soundAddList = ['ocean', 'fire', 'rain'];
+    var selectedSound = "ocean";
+    var sound_obj;
+    
+    var fullSizeBtn = document.querySelector('#fullSizeBtn');
+
+    function doFullScreen() {
+        if(fullCheck) { //full
+            fullCheck = false;
+            document.querySelector("#addCheck").style.display = 'none';
+            // document.querySelector('#time').style.fontSize = '175px';
+            document.querySelector('#time').style.marginTop = '0';
+            setFullScreen();
+            setFullScreenCSS();
+            
+        }else { //original
+            fullCheck = true;
+            setOriginalScreen();
+            setOriginalCSS();
+
+        }
+    }
+
+    function setFullScreen() {
+        var fullArea = document.querySelector('#fullArea');
+        // fullArea.webkitRequestFullscreen();
+        if (fullArea.requestFullscreen) {
+            fullArea.requestFullscreen();
+            document.querySelector('#time').style.fontSize = '175px';  
+        }else if (fullArea.mozRequestFullScreen) {
+            fullArea.mozRequestFullScreen();
+        }else if (fullArea.webkitRequestFullscreen) {
+            fullArea.webkitRequestFullscreen();
+        }else if (fullArea.msRequestFullscreen) {
+            fullArea.msRequestFullscreen();
+        }
+
+        var sound = new Howl({
+            src: ['sound/' + selectedSound+ '.mp3'],
+            loop: true
+        });
+        sound_obj = sound;
+        sound.play();
+    }
+    
+    function setFullScreenCSS() {
+            //backgroud setting
+            let bg_check = imageAddList[document.querySelector('li.selected').value];
+            if (bg_check == 'black') {
+                fullArea.style.backgroundColor = "#000000";
+            } else if (bg_check == 'white') {
+                fullArea.style.backgroundColor = "#ffffff";
+                document.querySelector('#time').style.color = "#000000";
+            } else {
+                fullArea.style.backgroundImage = "url(img/" + bg_check + ".jpg)";
+            }
+        }
+
+        function setOriginalScreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();    
+            }else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            }else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        function setOriginalCSS() {
+            document.querySelector("#addCheck").style.display = 'block';
+            document.querySelector('#fullArea').style.backgroundImage = ""
+            document.querySelector('#fullArea').style.backgroundColor = "#000000";
+            document.querySelector('#time').style.color = "#f8f8f8";
+            document.querySelector('#time').style.fontSize = '150px';
+            document.querySelector('#time').style.marginTop = '100px';
+        
+            sound_obj.stop();
+        }
+        document.addEventListener("fullscreenchange", fullScreenChange);
+        document.addEventListener("webkitfullscreenchange", fullScreenChange);
+        document.addEventListener("mozfullscreenchange", fullScreenChange);
+        document.addEventListener("MSFullscreenChange", fullScreenChange);
+
+        function fullScreenChange() {
+            if (document.fullscreenElement) { //full
+                fullCheck = false;
+            }
+            else { //original
+                fullCheck = true;
+                setOriginalCSS();
+            }
+        }
+        // document.addEventListener("fullscreenchange", (e) => {
+        //     if (document.fullscreenElement) { //full
+        //         fullCheck = false;
+        //     }
+        //     else { //original
+        //         fullCheck = true;
+        //         alert("tets");
+        //         setOriginalCSS();
+        //     }
+        // });
+    
     window.onload = function () {
         let minutes = 0;
         let seconds = 0;
@@ -139,15 +250,8 @@
         let stopBtn = document.querySelector('#stop');
         let resetBtn = document.querySelector('#reset');
         let Interval;
-        let fullSizeBtn = document.querySelector('#fullSizeBtn');
-        let fullCheck = true;
-        let imageMenuWrap = document.querySelector('#image-menu-wrap');
-        let soundMenuWrap = document.querySelector('#sound-menu-wrap');
-        let imageAddList = ["black", "white", "ocean", "fire", "rain"];
-        let selectedImage = "black";
-        let soundAddList = ['ocean', 'fire', 'rain'];
-        let selectedSound = "ocean";
-        let sound_obj;
+        
+        
 
         const startTimer = () => {
             tens++;
@@ -197,91 +301,6 @@
             appendTens.innerHTML = tens;
             appendSecond.innerHTML = seconds;
             appendMinutes.innerHTML = tens;
-        };
-
-        function setFullScreen() {
-            let fullArea = document.querySelector('#fullArea');
-            if (fullArea.requestFullscreen) {
-                fullArea.requestFullscreen();    
-            }else if (fullArea.mozRequestFullScreen) {
-                fullArea.mozRequestFullScreen();
-            }else if (fullArea.webkitRequestFullscreen) {
-                fullArea.webkitRequestFullscreen();
-            }else if (fullArea.msRequestFullscreen) {
-                fullArea.msRequestFullscreen();
-            }
-            //backgroud setting
-            let bg_check = imageAddList[document.querySelector('li.selected').value];
-            if (bg_check == 'black') {
-                fullArea.style.backgroundColor = "#000000";
-            } else if (bg_check == 'white') {
-                fullArea.style.backgroundColor = "#ffffff";
-                document.querySelector('#time').style.color = "#000000";
-            } else {
-                fullArea.style.backgroundImage = "url(img/" + bg_check + ".jpg)";
-            }
-
-            var sound = new Howl({
-                src: ['sound/' + selectedSound+ '.mp3'],
-                loop: true
-            });
-            sound_obj = sound;
-            sound.play();
-        }
-
-        function setOriginalScreen() {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();    
-            }else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            }else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            }else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
-        }
-
-        function setOriginalCSS() {
-            document.querySelector("#addCheck").style.display = 'block';
-            document.querySelector('#fullArea').style.backgroundImage = ""
-            document.querySelector('#fullArea').style.backgroundColor = "#000000";
-            document.querySelector('#time').style.color = "#f8f8f8";
-            document.querySelector('#time').style.fontSize = '150px';
-            document.querySelector('#time').style.marginTop = '100px';
-            
-            var sound = new Howl({
-                src: ['sound/' + selectedSound+ '.mp3'],
-                loop: true
-            });
-            sound_obj.stop();
-        }
-
-        document.addEventListener("fullscreenchange", (e) => {
-            if (document.fullscreenElement) { //full
-                fullCheck = false;
-            }
-            else { //original
-                fullCheck = true;
-                setOriginalScreen();
-                setOriginalCSS();
-            }
-        });
-        
-        fullSizeBtn.onclick = () => {
-            if(fullCheck) { //full
-                fullCheck = false;
-                document.querySelector("#addCheck").style.display = 'none';
-                document.querySelector('#time').style.fontSize = '175px';
-                document.querySelector('#time').style.marginTop = '0'
-                setFullScreen();
-                
-            }else { //original
-                fullCheck = true;
-                setOriginalScreen();
-                setOriginalCSS();
-
-            }
-            
         };
  
         function select(ulEl, liEl){

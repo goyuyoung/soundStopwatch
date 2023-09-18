@@ -216,7 +216,7 @@ strong {
 
 @media screen and (max-width:600px) {
     .container {
-        max-width: 480px;
+        max-width: 500px;
     }
     .time {
         font-size: 5.5rem; 
