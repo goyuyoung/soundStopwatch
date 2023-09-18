@@ -79,7 +79,7 @@
             </div>
     
             <div class="addCheck" id="addCheck">
-                <a href="#" id="fullSizeBtn" class="fullSizeBtn">전체화면</a>
+                <a href="#" id="fullSizeBtn" class="sizeBtn">전체화면</a>
                 <div class="add" id="add">
                     <p class="add_title"><i class="fa-solid fa-quote-left"></i>ㅤ배경화면 이미지를 선택해주세요.ㅤ<i class="fa-solid fa-quote-right"></i></p>
                     <div class="add_list">
@@ -262,6 +262,7 @@
             }
             else { //original
                 fullCheck = true;
+                setOriginalScreen();
                 setOriginalCSS();
             }
         });
@@ -276,8 +277,8 @@
                 
             }else { //original
                 fullCheck = true;
-                setOriginalCSS();
                 setOriginalScreen();
+                setOriginalCSS();
 
             }
             
